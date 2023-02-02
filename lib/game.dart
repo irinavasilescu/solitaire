@@ -51,22 +51,25 @@ class _GameState extends State<Game> {
 
   @override
   Widget build(BuildContext context) {
-    return GridView.count(
-      crossAxisCount: 5,
-      children: [
-        for (var card in displayedCards)
-        GestureDetector(
-          onTap: () {
-            print('Clicked on: ' + card.suit.name + ' ' + card.value.name);
-          },
-          child: Container(
-            child: PlayingCardView(
-              card: PlayingCard(card.suit, card.value),
-              style: cardStyles
-            )
-          ),
-        )
-      ]
+    return Container(
+      color: Colors.green,
+      child: GridView.count(
+        crossAxisCount: 5,
+        children: [
+          for (var card in displayedCards)
+          GestureDetector(
+            onTap: () {
+              print('Clicked on: ' + card.suit.name + ' ' + card.value.name);
+            },
+            child: Container(
+              child: PlayingCardView(
+                card: PlayingCard(card.suit, card.value),
+                style: cardStyles
+              )
+            ),
+          )
+        ]
+      ),
     );
   }
 }
