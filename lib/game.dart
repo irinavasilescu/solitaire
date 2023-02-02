@@ -55,11 +55,16 @@ class _GameState extends State<Game> {
       crossAxisCount: 5,
       children: [
         for (var card in displayedCards)
-        Container(
-          child: PlayingCardView(
-            card: PlayingCard(card.suit, card.value),
-            style: cardStyles
-          )
+        GestureDetector(
+          onTap: () {
+            print('Clicked on: ' + card.suit.name + ' ' + card.value.name);
+          },
+          child: Container(
+            child: PlayingCardView(
+              card: PlayingCard(card.suit, card.value),
+              style: cardStyles
+            )
+          ),
         )
       ]
     );
