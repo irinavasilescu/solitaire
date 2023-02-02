@@ -13,6 +13,17 @@ class _GameState extends State<Game> {
   late List<PlayingCard> remainingCards;
   late List<PlayingCard> discardedCards;
 
+  static int DISPLAYED_CARDS_NUMBER = 25;
+  static int TOTAL_CARDS_NUMBER = 52;
+
+  PlayingCardViewStyle cardStyles = PlayingCardViewStyle(
+    cardBackContentBuilder: (context) => Image.asset(
+      "assets/card_back.png",
+      fit: BoxFit.fill,
+      filterQuality: FilterQuality.high
+    )
+  );
+  
   @override
   void initState()
   {
@@ -23,11 +34,18 @@ class _GameState extends State<Game> {
   void initGame() {
     deck.shuffle();
     initDisplayedCards();
+    initRemainingCards();
   }
 
   void initDisplayedCards() {
     setState(() {
-      displayedCards = deck.take(25).toList();
+      displayedCards = deck.take(DISPLAYED_CARDS_NUMBER).toList();
+    });
+  }
+
+  void initRemainingCards() {
+    setState(() {
+      remainingCards = deck.reversed.take(TOTAL_CARDS_NUMBER - DISPLAYED_CARDS_NUMBER).toList();
     });
   }
 
@@ -38,9 +56,9 @@ class _GameState extends State<Game> {
       children: [
         for (var card in displayedCards)
         Container(
-          height: 75,
           child: PlayingCardView(
-            card: PlayingCard(card.suit, card.value)
+            card: PlayingCard(card.suit, card.value),
+            style: cardStyles
           )
         )
       ]
