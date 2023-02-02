@@ -56,14 +56,16 @@ class _GameState extends State<Game> {
       child: GridView.count(
         crossAxisCount: 5,
         children: [
-          for (var card in displayedCards)
+          for (MapEntry cardEntry in displayedCards.asMap().entries)
           GestureDetector(
             onTap: () {
-              print('Clicked on: ' + card.suit.name + ' ' + card.value.name);
+              print('Suit: ${(cardEntry.value as PlayingCard).suit.name}');
+              print('Value: ${(cardEntry.value as PlayingCard).value.name}');
+              print('Index: ${cardEntry.key.toString()}');
             },
             child: Container(
               child: PlayingCardView(
-                card: PlayingCard(card.suit, card.value),
+                card: PlayingCard(cardEntry.value.suit, cardEntry.value.value),
                 style: cardStyles
               )
             ),
