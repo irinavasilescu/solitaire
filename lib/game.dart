@@ -62,6 +62,19 @@ class _GameState extends State<Game> {
     });
   }
 
+  void updateDisplayedCards() {
+    displayedCards = displayedCards.where((card) => card.suit != Suit.joker).toList();
+    
+    int necessaryCardsNumber = DISPLAYED_CARDS_NUMBER - displayedCards.length;
+
+    displayedCards = [
+      ...displayedCards,
+      ...remainingCards.take(necessaryCardsNumber)
+    ];
+
+    remainingCards = remainingCards.sublist(necessaryCardsNumber);
+  }
+
   void initRemainingCards() {
     setState(() {
       remainingCards = deck.reversed.take(TOTAL_CARDS_NUMBER - DISPLAYED_CARDS_NUMBER).toList();
@@ -84,6 +97,10 @@ class _GameState extends State<Game> {
     ];
 
     return adjacentPositions.contains(position2);
+  }
+
+  bool areValuesIdentical(PlayingCard card1, PlayingCard card2) {
+    return card1.value == card2.value;
   }
 
   void selectCard(PlayingCard card, int position) {
@@ -109,11 +126,26 @@ class _GameState extends State<Game> {
       int pos1 = selectedCard1?.position as int;
       int pos2 = selectedCard2?.position as int;
 
-      if (arePositionsAdjacent(pos1, pos2)) {
+      PlayingCard card1 = selectedCard1?.card as PlayingCard;
+      PlayingCard card2 = selectedCard2?.card as PlayingCard;
+
+      if (arePositionsAdjacent(pos1, pos2) && areValuesIdentical(card1, card2)) {
         print('adjacent!');
+        // replace them with joker
+
+        discardedCards.add(card1);
+        discardedCards.add(card2);
+
+        displayedCards[pos1] = PlayingCard(Suit.joker, CardValue.joker_1);
+        displayedCards[pos2] = PlayingCard(Suit.joker, CardValue.joker_1);
       } else {
         print('NOT adjacent!');
       }
+
+      selectedCard1 = null;
+      selectedCard2 = null;
+
+      initElevations();
     }
   }
 
