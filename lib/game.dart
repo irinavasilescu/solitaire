@@ -1,6 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:playing_cards/playing_cards.dart';
 
+class SelectedCard {
+  final PlayingCard card;
+  final int position;
+
+  SelectedCard(this.card, this.position);
+}
+
 class Game extends StatefulWidget {
   @override
   _GameState createState() => _GameState();
@@ -15,8 +22,8 @@ class _GameState extends State<Game> {
 
   Map<int, double> elevations = {};
 
-  PlayingCard? selectedCard1;
-  PlayingCard? selectedCard2;
+  SelectedCard? selectedCard1;
+  SelectedCard? selectedCard2;
 
   static int DISPLAYED_CARDS_NUMBER = 25;
   static int TOTAL_CARDS_NUMBER = 52;
@@ -81,22 +88,33 @@ class _GameState extends State<Game> {
 
   void selectCard(PlayingCard card, int position) {
     if (selectedCard1 == null) {
-      selectedCard1 = card;
+      selectedCard1 = new SelectedCard(card, position);
       setState(() {
         elevations[position] = 10;
       });
       return;
     }
 
-    if (selectedCard1?.suit.name != card.suit.name || selectedCard1?.value.name != card.value.name) {
-      selectedCard2 = card;
+    if (selectedCard1?.card?.suit.name != card.suit.name || selectedCard1?.card?.value.name != card.value.name) {
+      selectedCard2 = new SelectedCard(card, position);
       setState(() {
         elevations[position] = 10;
       });
     }
 
-    print('selected card 1: ${selectedCard1?.suit.name}, ${selectedCard1?.value.name}');
-    print('selected card 2: ${selectedCard2?.suit.name}, ${selectedCard2?.value.name}');
+    print('selected card 1: ${selectedCard1?.card.suit.name}, ${selectedCard1?.card.value.name}');
+    print('selected card 2: ${selectedCard2?.card.suit.name}, ${selectedCard2?.card.value.name}');
+    
+    if (selectedCard1?.position != null && selectedCard2?.position != null) {
+      int pos1 = selectedCard1?.position as int;
+      int pos2 = selectedCard2?.position as int;
+
+      if (arePositionsAdjacent(pos1, pos2)) {
+        print('adjacent!');
+      } else {
+        print('NOT adjacent!');
+      }
+    }
   }
 
   @override
