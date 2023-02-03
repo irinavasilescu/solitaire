@@ -164,11 +164,13 @@ class _GameState extends State<Game> {
               selectCard(cardEntry.value as PlayingCard, cardEntry.key);
             },
             child: Container(
-              child: PlayingCardView(
-                card: PlayingCard(cardEntry.value.suit, cardEntry.value.value),
-                style: cardStyles,
-                elevation: elevations[cardEntry.key]
-              )
+              child: cardEntry.value.suit != Suit.joker
+                ? PlayingCardView(
+                  card: PlayingCard(cardEntry.value.suit, cardEntry.value.value),
+                  style: cardStyles,
+                  elevation: elevations[cardEntry.key]
+                )
+                : Container()
             ),
           )
         ]
