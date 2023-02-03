@@ -52,7 +52,7 @@ class _GameState extends State<Game> {
   }
 
   void initElevations() {
-    for (var i = 0; i < displayedCardsNumber; i++) {
+    for (var i = 0; i < displayedCards.length; i++) {
       elevations[i] = 0;
     }
   }
@@ -69,17 +69,27 @@ class _GameState extends State<Game> {
     }).toList();
     
     int necessaryCardsNumber = displayedCardsNumber - remainingDisplayedCards.length;
+    List<PlayingCard> cardsToBeAdded = [];
+
+    if (remainingCards.length >= necessaryCardsNumber) {
+      cardsToBeAdded = remainingCards.take(necessaryCardsNumber).toList();
+    } else {
+      cardsToBeAdded = remainingCards;
+    }
 
     setState(() {
       displayedCards = [
         ...remainingDisplayedCards,
-        ...remainingCards.take(necessaryCardsNumber)
+        ...cardsToBeAdded
       ];
-
     });
 
     setState(() {
-      remainingCards = remainingCards.sublist(necessaryCardsNumber);
+      if (remainingCards.length >= necessaryCardsNumber) {
+        remainingCards = remainingCards.sublist(necessaryCardsNumber);
+      } else {
+        remainingCards = [];
+      }
     });
   }
 
@@ -164,8 +174,19 @@ class _GameState extends State<Game> {
       child: Column(
         children: [
           Expanded(
-            flex: 4,
+            flex: 1,
+            child: Container(
+              alignment: Alignment(0, 0),
+              child: DefaultTextStyle(
+                child: Text('Monte Carlo Solitaire'),
+                style: TextStyle(color: Colors.white)
+              )
+            )
+          ),
+          Expanded(
+            flex: 12,
             child: GridView.count(
+              // physics: NeverScrollableScrollPhysics(),
               childAspectRatio: cardAspectRatio,
               crossAxisCount: 5,
               children: [
@@ -177,6 +198,9 @@ class _GameState extends State<Game> {
                     selectCard(cardEntry.value as PlayingCard, cardEntry.key);
                   },
                   child: Container(
+                    decoration: BoxDecoration(
+                      border: elevations[cardEntry.key] == 10 ? Border.all(color: Colors.lightGreen, width: 5) : null
+                    ),
                     child: cardEntry.value.suit != Suit.joker
                       ? PlayingCardView(
                         card: PlayingCard(cardEntry.value.suit, cardEntry.value.value),
@@ -190,22 +214,27 @@ class _GameState extends State<Game> {
             ),
           ),
           Expanded(
+            flex: 2,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 GestureDetector(
                   onTap: updateDisplayedCards,
                   child: Container(
-                    child: Stack(
-                      children: [
-                        for (var card in remainingCards)
-                        PlayingCardView(
-                          card: PlayingCard(card.suit, card.value),
-                          style: cardStyles,
-                          showBack: true
-                        )
-                      ],
-                    ),
+                    child: remainingCards.length > 0
+                      ? Stack(
+                        children: [
+                          for (var card in remainingCards)
+                          PlayingCardView(
+                            card: PlayingCard(card.suit, card.value),
+                            style: cardStyles,
+                            showBack: true
+                          )
+                        ],
+                      )
+                      : Container(
+                        child: Text('Rearrange')
+                      )
                   ),
                 ),
                 Container(
