@@ -63,16 +63,23 @@ class _GameState extends State<Game> {
   }
 
   void updateDisplayedCards() {
-    displayedCards = displayedCards.where((card) => card.suit != Suit.joker).toList();
+    List<PlayingCard> remainingDisplayedCards = displayedCards.where((card) {
+      return card.suit != Suit.joker;
+    }).toList();
     
-    int necessaryCardsNumber = DISPLAYED_CARDS_NUMBER - displayedCards.length;
+    int necessaryCardsNumber = DISPLAYED_CARDS_NUMBER - remainingDisplayedCards.length;
 
-    displayedCards = [
-      ...displayedCards,
-      ...remainingCards.take(necessaryCardsNumber)
-    ];
+    setState(() {
+      displayedCards = [
+        ...remainingDisplayedCards,
+        ...remainingCards.take(necessaryCardsNumber)
+      ];
 
-    remainingCards = remainingCards.sublist(necessaryCardsNumber);
+    });
+
+    setState(() {
+      remainingCards = remainingCards.sublist(necessaryCardsNumber);
+    });
   }
 
   void initRemainingCards() {
@@ -153,25 +160,66 @@ class _GameState extends State<Game> {
   Widget build(BuildContext context) {
     return Container(
       color: Colors.green,
-      child: GridView.count(
-        crossAxisCount: 5,
+      child: Column(
         children: [
-          for (MapEntry cardEntry in displayedCards.asMap().entries)
-          GestureDetector(
-            onTap: () {
-              print('Card: ${(cardEntry.value as PlayingCard).suit.name}, ${(cardEntry.value as PlayingCard).value.name}');
-              print('Index: ${cardEntry.key.toString()}');
-              selectCard(cardEntry.value as PlayingCard, cardEntry.key);
-            },
-            child: Container(
-              child: cardEntry.value.suit != Suit.joker
-                ? PlayingCardView(
-                  card: PlayingCard(cardEntry.value.suit, cardEntry.value.value),
-                  style: cardStyles,
-                  elevation: elevations[cardEntry.key]
+          Expanded(
+            flex: 3,
+            child: GridView.count(
+              crossAxisCount: 5,
+              children: [
+                for (MapEntry cardEntry in displayedCards.asMap().entries)
+                GestureDetector(
+                  onTap: () {
+                    print('Card: ${(cardEntry.value as PlayingCard).suit.name}, ${(cardEntry.value as PlayingCard).value.name}');
+                    print('Index: ${cardEntry.key.toString()}');
+                    selectCard(cardEntry.value as PlayingCard, cardEntry.key);
+                  },
+                  child: Container(
+                    child: cardEntry.value.suit != Suit.joker
+                      ? PlayingCardView(
+                        card: PlayingCard(cardEntry.value.suit, cardEntry.value.value),
+                        style: cardStyles,
+                        elevation: elevations[cardEntry.key]
+                      )
+                      : Container()
+                  ),
                 )
-                : Container()
+              ]
             ),
+          ),
+          Expanded(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                GestureDetector(
+                  onTap: updateDisplayedCards,
+                  child: Container(
+                    child: Stack(
+                      children: [
+                        for (var card in remainingCards)
+                        PlayingCardView(
+                          card: PlayingCard(card.suit, card.value),
+                          style: cardStyles,
+                          showBack: true
+                        )
+                      ],
+                    ),
+                  ),
+                ),
+                Container(
+                  child: Stack(
+                    children: [
+                        for (var card in discardedCards)
+                        PlayingCardView(
+                          card: PlayingCard(card.suit, card.value),
+                          style: cardStyles,
+                          showBack: false
+                        )
+                      ]
+                  )
+                )
+              ]
+            )
           )
         ]
       ),
