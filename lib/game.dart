@@ -9,9 +9,12 @@ class Game extends StatefulWidget {
 class _GameState extends State<Game> {
   List<PlayingCard> deck = standardFiftyTwoCardDeck();
 
-  late List<PlayingCard> displayedCards;
-  late List<PlayingCard> remainingCards;
-  late List<PlayingCard> discardedCards;
+  List<PlayingCard> displayedCards = [];
+  List<PlayingCard> remainingCards = [];
+  List<PlayingCard> discardedCards = [];
+
+  PlayingCard? selectedCard1;
+  PlayingCard? selectedCard2;
 
   static int DISPLAYED_CARDS_NUMBER = 25;
   static int TOTAL_CARDS_NUMBER = 52;
@@ -67,6 +70,20 @@ class _GameState extends State<Game> {
     return adjacentPositions.contains(position2);
   }
 
+  void selectCard(PlayingCard card) {
+    if (selectedCard1 == null) {
+      selectedCard1 = card;
+      return;
+    }
+
+    if (selectedCard1?.suit.name != card.suit.name && selectedCard1?.value.name != card.value.name) {
+      selectedCard2 = card;
+    }
+
+    print('selected card 1: ${selectedCard1?.suit.name}, ${selectedCard1?.value.name}');
+    print('selected card 2: ${selectedCard2?.suit.name}, ${selectedCard2?.value.name}');
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -80,6 +97,7 @@ class _GameState extends State<Game> {
               print('Suit: ${(cardEntry.value as PlayingCard).suit.name}');
               print('Value: ${(cardEntry.value as PlayingCard).value.name}');
               print('Index: ${cardEntry.key.toString()}');
+              selectCard(cardEntry.value as PlayingCard);
             },
             child: Container(
               child: PlayingCardView(
