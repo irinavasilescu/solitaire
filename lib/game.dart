@@ -25,8 +25,9 @@ class _GameState extends State<Game> {
   SelectedCard? selectedCard1;
   SelectedCard? selectedCard2;
 
-  static int DISPLAYED_CARDS_NUMBER = 25;
-  static int TOTAL_CARDS_NUMBER = 52;
+  static int displayedCardsNumber = 25;
+  static int totalCardsNumber = 52;
+  static double cardAspectRatio = 64.0 / 89.0;
 
   PlayingCardViewStyle cardStyles = PlayingCardViewStyle(
     cardBackContentBuilder: (context) => Image.asset(
@@ -51,14 +52,14 @@ class _GameState extends State<Game> {
   }
 
   void initElevations() {
-    for (var i = 0; i < DISPLAYED_CARDS_NUMBER; i++) {
+    for (var i = 0; i < displayedCardsNumber; i++) {
       elevations[i] = 0;
     }
   }
 
   void initDisplayedCards() {
     setState(() {
-      displayedCards = deck.take(DISPLAYED_CARDS_NUMBER).toList();
+      displayedCards = deck.take(displayedCardsNumber).toList();
     });
   }
 
@@ -67,7 +68,7 @@ class _GameState extends State<Game> {
       return card.suit != Suit.joker;
     }).toList();
     
-    int necessaryCardsNumber = DISPLAYED_CARDS_NUMBER - remainingDisplayedCards.length;
+    int necessaryCardsNumber = displayedCardsNumber - remainingDisplayedCards.length;
 
     setState(() {
       displayedCards = [
@@ -84,7 +85,7 @@ class _GameState extends State<Game> {
 
   void initRemainingCards() {
     setState(() {
-      remainingCards = deck.reversed.take(TOTAL_CARDS_NUMBER - DISPLAYED_CARDS_NUMBER).toList();
+      remainingCards = deck.reversed.take(totalCardsNumber - displayedCardsNumber).toList();
     });
   }
 
@@ -112,7 +113,7 @@ class _GameState extends State<Game> {
 
   void selectCard(PlayingCard card, int position) {
     if (selectedCard1 == null) {
-      selectedCard1 = new SelectedCard(card, position);
+      selectedCard1 = SelectedCard(card, position);
       setState(() {
         elevations[position] = 10;
       });
@@ -120,7 +121,7 @@ class _GameState extends State<Game> {
     }
 
     if (selectedCard1?.card?.suit.name != card.suit.name || selectedCard1?.card?.value.name != card.value.name) {
-      selectedCard2 = new SelectedCard(card, position);
+      selectedCard2 = SelectedCard(card, position);
       setState(() {
         elevations[position] = 10;
       });
@@ -163,8 +164,9 @@ class _GameState extends State<Game> {
       child: Column(
         children: [
           Expanded(
-            flex: 3,
+            flex: 4,
             child: GridView.count(
+              childAspectRatio: cardAspectRatio,
               crossAxisCount: 5,
               children: [
                 for (MapEntry cardEntry in displayedCards.asMap().entries)
@@ -209,13 +211,13 @@ class _GameState extends State<Game> {
                 Container(
                   child: Stack(
                     children: [
-                        for (var card in discardedCards)
-                        PlayingCardView(
-                          card: PlayingCard(card.suit, card.value),
-                          style: cardStyles,
-                          showBack: false
-                        )
-                      ]
+                      for (var card in discardedCards)
+                      PlayingCardView(
+                        card: PlayingCard(card.suit, card.value),
+                        style: cardStyles,
+                        showBack: false
+                      )
+                    ]
                   )
                 )
               ]
