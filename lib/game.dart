@@ -49,6 +49,24 @@ class _GameState extends State<Game> {
     });
   }
 
+  // x-6 x-5 x-4
+  // x-1  x  x+1
+  // x+4 x+5 x+6
+  bool arePositionsAdjacent(int position1, int position2) {
+    List<int> adjacentPositions = [
+      position1 - 6,
+      position1 - 5,
+      position1 - 4,
+      position1 - 1,
+      position1 + 1,
+      position1 + 4,
+      position1 + 5,
+      position1 + 6
+    ];
+
+    return adjacentPositions.contains(position2);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
