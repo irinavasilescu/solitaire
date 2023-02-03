@@ -13,6 +13,8 @@ class _GameState extends State<Game> {
   List<PlayingCard> remainingCards = [];
   List<PlayingCard> discardedCards = [];
 
+  Map<int, double> elevations = {};
+
   PlayingCard? selectedCard1;
   PlayingCard? selectedCard2;
 
@@ -32,12 +34,19 @@ class _GameState extends State<Game> {
   {
     super.initState();
     initGame();
+    initElevations();
   }
 
   void initGame() {
     deck.shuffle();
     initDisplayedCards();
     initRemainingCards();
+  }
+
+  void initElevations() {
+    for (var i = 0; i < DISPLAYED_CARDS_NUMBER; i++) {
+      elevations[i] = 0;
+    }
   }
 
   void initDisplayedCards() {
@@ -70,14 +79,20 @@ class _GameState extends State<Game> {
     return adjacentPositions.contains(position2);
   }
 
-  void selectCard(PlayingCard card) {
+  void selectCard(PlayingCard card, int position) {
     if (selectedCard1 == null) {
       selectedCard1 = card;
+      setState(() {
+        elevations[position] = 10;
+      });
       return;
     }
 
-    if (selectedCard1?.suit.name != card.suit.name && selectedCard1?.value.name != card.value.name) {
+    if (selectedCard1?.suit.name != card.suit.name || selectedCard1?.value.name != card.value.name) {
       selectedCard2 = card;
+      setState(() {
+        elevations[position] = 10;
+      });
     }
 
     print('selected card 1: ${selectedCard1?.suit.name}, ${selectedCard1?.value.name}');
@@ -94,15 +109,15 @@ class _GameState extends State<Game> {
           for (MapEntry cardEntry in displayedCards.asMap().entries)
           GestureDetector(
             onTap: () {
-              print('Suit: ${(cardEntry.value as PlayingCard).suit.name}');
-              print('Value: ${(cardEntry.value as PlayingCard).value.name}');
+              print('Card: ${(cardEntry.value as PlayingCard).suit.name}, ${(cardEntry.value as PlayingCard).value.name}');
               print('Index: ${cardEntry.key.toString()}');
-              selectCard(cardEntry.value as PlayingCard);
+              selectCard(cardEntry.value as PlayingCard, cardEntry.key);
             },
             child: Container(
               child: PlayingCardView(
                 card: PlayingCard(cardEntry.value.suit, cardEntry.value.value),
-                style: cardStyles
+                style: cardStyles,
+                elevation: elevations[cardEntry.key]
               )
             ),
           )
